@@ -9,14 +9,15 @@ export default defineConfig({
   use: {
     ...devices['Pixel 7'],
     viewport: { width: 390, height: 844 },
-    baseURL: `http://localhost:${PORT}`,
+    // served under the same base path as GitHub Pages, so asset and worker addresses are tested as deployed
+    baseURL: `http://localhost:${PORT}/wonderwander/`,
     serviceWorkers: 'allow',
   },
   webServer: {
     command: `npx tsx scripts/build-pack.ts && npx vite build --mode e2e && npx vite preview --port ${PORT} --strictPort --mode e2e`,
-    url: `http://localhost:${PORT}`,
+    url: `http://localhost:${PORT}/wonderwander/`,
     reuseExistingServer: false,
     timeout: 180_000,
-    env: { VITE_SUPABASE_URL: 'https://fake.supabase.test', VITE_SUPABASE_ANON_KEY: 'fake-key', VITE_BASE_PATH: '/', VITE_CONTENT_SOURCE: 'pack', PACK_AUTHOR: 'Laiba' },
+    env: { VITE_SUPABASE_URL: 'https://fake.supabase.test', VITE_SUPABASE_ANON_KEY: 'fake-key', VITE_BASE_PATH: '/wonderwander/', VITE_CONTENT_SOURCE: 'pack', PACK_AUTHOR: 'Laiba' },
   },
 });

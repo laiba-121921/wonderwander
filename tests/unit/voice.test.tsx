@@ -33,6 +33,10 @@ class FakeRecognition {
   emit(text: string, isFinal: boolean) {
     this.onresult?.({ resultIndex: 0, results: [{ isFinal, 0: { transcript: text } }] });
   }
+  // the whole result list, as Chrome passes it on every event
+  emitAll(list: [string, boolean][]) {
+    this.onresult?.({ resultIndex: 0, results: list.map(([transcript, isFinal]) => ({ isFinal, 0: { transcript } })) });
+  }
 }
 
 // A stand-in for MediaRecorder and the microphone.
@@ -92,6 +96,25 @@ describe('live dictation (PHASE_15_PLUS 2.1)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Stop dictating' }));
     expect(rec.started).toBe(false);
     expect(screen.getByRole('button', { name: 'Dictate (hold to record)' })).toBeTruthy();
+  });
+
+  it('never doubles words when the browser repeats or re-extends its results, as Chrome on Android does', () => {
+    w.webkitSpeechRecognition = FakeRecognition;
+    render(<Field />);
+    fireEvent.click(screen.getByRole('button', { name: 'Dictate (hold to record)' }));
+    const rec = FakeRecognition.last!;
+    const field = () => (screen.getByLabelText('Your answer') as HTMLTextAreaElement).value;
+    act(() => rec.emitAll([['hello', true]]));
+    act(() => rec.emitAll([['hello', true], ['hello', true]]));
+    act(() => rec.emitAll([['hello', true], ['hello', true], ['hello how', true]]));
+    act(() => rec.emitAll([['hello', true], ['hello', true], ['hello how', true], ['hello how are you', true], ['are you doing', false]]));
+    expect(field()).toBe('First words. hello how are you');
+    expect(screen.getByText('doing').className).toContain('text-ink-soft');
+    act(() => rec.emitAll([['hello', true], ['hello', true], ['hello how', true], ['hello how are you', true], ['are you doing', true]]));
+    expect(field()).toBe('First words. hello how are you doing');
+    // a separate segment, as desktop Chrome sends one, follows with a space
+    act(() => rec.emitAll([['hello how are you doing', true], ['I am fine', true]]));
+    expect(field()).toBe('First words. hello how are you doing I am fine');
   });
 
   it('falls back to en-GB when the browser has no en-PK', () => {
@@ -194,5 +217,18 @@ describe('transcription on the server (PHASE_15_PLUS 2.2 and 2.3)', () => {
     expect(joinText('One.', 'Two.')).toBe('One. Two.');
     expect(joinText('', 'Two.')).toBe('Two.');
     expect(joinText('One.\n', 'Two.')).toBe('One.\nTwo.');
+  });
+});
+
+describe('merging recognition results', () => {
+  it('keeps separate segments, drops repeats and extends at the overlap', async () => {
+    const { mergeResults, wordsAfter } = await import('../../src/lib/voice');
+    expect(mergeResults(['the premise', 'is false'])).toBe('the premise is false');
+    expect(mergeResults(['hello', 'hello', 'hello', 'hello how', 'hello how are', 'hello how are you'])).toBe('hello how are you');
+    expect(mergeResults(['so the first', 'the first premise fails'])).toBe('so the first premise fails');
+    expect(mergeResults(['Hello,', 'hello how'])).toBe('hello how'.replace('hello', 'Hello,'));
+    expect(mergeResults(['', '  '])).toBe('');
+    expect(wordsAfter('hello how are you', 'are you doing')).toBe('doing');
+    expect(wordsAfter('', 'just started')).toBe('just started');
   });
 });

@@ -179,7 +179,7 @@ export async function fakeSupabase(page: Page, { owner = true }: { owner?: boole
 }
 
 export async function signIn(page: Page) {
-  await page.goto('/');
+  await page.goto('./'); // relative, so a build served under a base path works too
   await page.getByLabel('Email').fill('laiba@example.invalid');
   await page.getByLabel('Password').fill('right-password');
   await page.getByRole('button', { name: 'Sign in' }).click();

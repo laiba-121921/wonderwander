@@ -81,7 +81,7 @@ test('Political 13 switches sides after five turns, then three reversed turns', 
   await expect(page.getByText('Turn 6 of 8')).toBeVisible();
   await page.getByRole('button', { name: 'Switch sides' }).click();
   await expect(page.getByLabel('Your reply')).toBeVisible();
-  expect(db.boss_session![0]!.phase).toBe('reversal');
+  await expect.poll(() => db.boss_session![0]!.phase).toBe('reversal'); // the screen switches before the save lands
   for (let i = 0; i < 3; i++) await say(page, `RIGHT: reversed ${i + 1}.`);
   await expect(page.getByText('Nailed it.')).toBeVisible();
   expect(String(db.attempt![0]!.answer_text)).toContain('STUDENT (reversed): RIGHT: reversed 3.');

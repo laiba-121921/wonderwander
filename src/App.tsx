@@ -10,7 +10,6 @@ import { ErrorBoundary } from './ui/ErrorBoundary';
 import { NoKeyBanner } from './ui/NoKeyBanner';
 import { tabs } from './routes';
 
-const GalleryScreen = lazy(() => import('./features/gallery/GalleryScreen'));
 const DomainScreen = lazy(() => import('./features/library/DomainScreen'));
 const UnitLibraryScreen = lazy(() => import('./features/library/UnitLibraryScreen'));
 const LessonScreen = lazy(() => import('./features/library/LessonScreen'));
@@ -45,7 +44,6 @@ export function Shell() {
               {tabs.map((tab) => (
                 <Route key={tab.path} path={tab.path} element={tab.element} />
               ))}
-              <Route path="/gallery" element={<GalleryScreen />} />
               <Route path="/library/:domainId" element={<DomainScreen />} />
               <Route path="/library/:domainId/:n" element={<UnitLibraryScreen />} />
               <Route path="/lesson/:unitId" element={<LessonScreen />} />

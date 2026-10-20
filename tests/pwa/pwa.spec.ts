@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('the build is installable: manifest, icons, a service worker that controls the page', async ({ page, request }) => {
-  await page.goto('/');
+  await page.goto('./');
   const href = await page.locator('link[rel=manifest]').getAttribute('href');
   const manifest = await (await request.get(href!)).json();
   expect(manifest).toMatchObject({ name: 'wonderwander', short_name: 'wonderwander', display: 'standalone', orientation: 'portrait', theme_color: '#f2a531', background_color: '#fff6e5', start_url: '.' });
@@ -25,7 +25,7 @@ test('offline, the shell, the library and a bundled reading still open', async (
   });
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
   // warm the lazily loaded screens once, as a first visit would
-  await page.goto('/#/library/logic/1');
+  await page.goto('./#/library/logic/1');
   await expect(page.getByRole('heading', { name: unitTitle('logic-1') })).toBeVisible();
 
   await context.setOffline(true);
@@ -33,7 +33,7 @@ test('offline, the shell, the library and a bundled reading still open', async (
   await expect(page.getByRole('heading', { name: unitTitle('logic-1') })).toBeVisible();
   await page.getByRole('button', { name: /Read Dialogues Concerning Natural Religion/ }).click();
   await expect(page.getByText('EPICURUS', { exact: false }).first()).toBeVisible();
-  await page.goto('/#/pulse');
+  await page.goto('./#/pulse');
   await expect(page.getByText('1 of 6')).toBeVisible(); // the logic pulse needs no network
   await context.setOffline(false);
 });
@@ -54,7 +54,7 @@ test('card reminders subscribe with the key from the push function and store the
   });
   await signIn(page);
   await expect.poll(() => page.evaluate(async () => Boolean(await navigator.serviceWorker.getRegistration()))).toBe(true);
-  await page.goto('/#/me');
+  await page.goto('./#/me');
   await page.getByRole('button', { name: 'Turn on card reminders' }).click();
   await expect(page.getByText('Reminders are on.')).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { __keyLength: number }).__keyLength)).toBe(65); // an uncompressed P-256 key
@@ -69,7 +69,7 @@ test('card reminders subscribe with the key from the push function and store the
 });
 
 test('no reload banner while no new version is waiting', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('./');
   await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.ready).active?.state)).toBe('activated');
   // pretend a new worker is installed and waiting, as after a deploy
   await page.evaluate(async () => {

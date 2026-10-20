@@ -46,13 +46,26 @@ export function useVoice({ value, onChange, colour = 'var(--amber)' }: { value: 
     onChange(next);
   };
 
+  // A dictation session reports everything said so far; the field's own copy of it is replaced each time, so a
+  // result the browser revises or repeats never doubles up. Anything typed before the session is kept.
+  const spoken = useRef('');
+  const showSpoken = (all: string) => {
+    const cur = latest.current;
+    const prev = spoken.current;
+    const next = prev && cur.endsWith(prev) ? cur.slice(0, cur.length - prev.length) + all : joinText(cur, all.startsWith(prev) ? all.slice(prev.length).trim() : all);
+    spoken.current = all;
+    latest.current = next;
+    onChange(next);
+  };
+
   const beginDictation = () => {
     setError(null);
     tick();
     setMode('listening');
+    spoken.current = '';
     dictation.current = startDictation({
       onInterim: setInterim,
-      onFinal: append,
+      onFinal: showSpoken,
       onEnd: () => {
         dictation.current = null;
         setInterim('');

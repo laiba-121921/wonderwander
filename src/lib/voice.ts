@@ -40,9 +40,45 @@ export const tick = () => {
   }
 };
 
+const wordsOf = (s: string) => s.trim().split(/\s+/).filter(Boolean);
+const key = (w: string) => w.toLowerCase().replace(/[^\p{L}\p{N}']/gu, '');
+
+// How many words at the end of `a` are the words at the start of `b`.
+function overlap(a: string[], b: string[]): number {
+  for (let k = Math.min(a.length, b.length); k > 0; k--) {
+    let same = true;
+    for (let i = 0; i < k && same; i++) same = key(a[a.length - k + i]!) === key(b[i]!);
+    if (same) return k;
+  }
+  return 0;
+}
+
+// One transcript from a run of recognition results. Desktop Chrome gives separate segments; Chrome on Android also
+// sends the same words again, or a longer version that starts with what came before. A result is joined at its
+// overlap with the text so far when it repeats it, extends it, or shares at least two words with its end; otherwise
+// it is new speech and follows with a space.
+export function mergeResults(parts: string[]): string {
+  let acc: string[] = [];
+  for (const part of parts) {
+    const words = wordsOf(part);
+    if (!words.length) continue;
+    const k = overlap(acc, words);
+    if (k === words.length || k === acc.length || k >= 2) acc = [...acc, ...words.slice(k)];
+    else acc = [...acc, ...words];
+  }
+  return acc.join(' ');
+}
+
+// The interim words that are not already in the final text.
+export function wordsAfter(finalText: string, interim: string): string {
+  const a = wordsOf(finalText);
+  const b = wordsOf(interim);
+  return b.slice(overlap(a, b)).join(' ');
+}
+
 export interface DictationHandlers {
   onInterim: (text: string) => void;
-  onFinal: (text: string) => void;
+  onFinal: (text: string) => void; // everything said so far in this session, final and merged
   onEnd: () => void;
   onError: (code: string) => void;
 }
@@ -62,14 +98,21 @@ export function startDictation(h: DictationHandlers, langIndex = 0): { stop: () 
   rec.interimResults = true;
   let next: { stop: () => void } | null = null;
   let stopped = false;
+  let said = '';
   rec.onresult = (e) => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
+    // the whole session each time, from every result: Chrome on Android repeats and re-extends results
+    const finals: string[] = [];
+    const interims: string[] = [];
+    for (let i = 0; i < e.results.length; i++) {
       const r = e.results[i]!;
-      if (r.isFinal) h.onFinal(r[0].transcript.trim());
-      else interim += r[0].transcript;
+      (r.isFinal ? finals : interims).push(r[0].transcript);
     }
-    h.onInterim(interim.trim());
+    const now = mergeResults(finals);
+    if (now !== said) {
+      said = now;
+      h.onFinal(now);
+    }
+    h.onInterim(wordsAfter(now, mergeResults(interims)));
   };
   rec.onerror = (e) => {
     if (e.error === 'language-not-supported' && langIndex + 1 < LANGS.length) {

@@ -110,9 +110,6 @@ export default function SettingsScreen() {
           About, licences and versions
         </Link>
       </p>
-      <p className="mt-2">
-        <Link to="/gallery">Design gallery</Link>
-      </p>
       <div className="mt-10">
         <Button variant="secondary" onClick={() => void supabase.auth.signOut()}>
           Sign out
