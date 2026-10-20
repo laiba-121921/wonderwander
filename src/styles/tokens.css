@@ -1,0 +1,35 @@
+/* BUILD_PLAN 19.2 to 19.4. No dark mode by design. */
+:root {
+  --paper: #fff6e5;
+  --paper-raised: #fffcf5;
+  --ink: #2f2546;
+  --ink-soft: #5e5478;
+  --amber: #f2a531;
+  --bubblegum: #f49ac1;
+  --lilac: #bfa8f5;
+  --grape: #6c4ba6;
+  --mint: #8ed9bc;
+  --sky: #9fd2f2;
+  --butter: #ffe380;
+  --peach: #ffbe98;
+  --pistachio: #c9e68f;
+  --coral: #e8676b;
+  --coral-tint: #fbe0df;
+
+  /* domain colours */
+  --logic: var(--sky);
+  --epistemology: var(--lilac);
+  --metaphysics: var(--mint);
+  --mind: var(--bubblegum);
+  --religion: var(--butter);
+  --religious-epistemology: var(--peach);
+  --political: var(--pistachio);
+
+  --r-sheet: 24px;
+  --r-card: 18px;
+  --r-button: 14px;
+  --r-input: 12px;
+
+  --sticker: 3px 3px 0 rgb(47 37 70 / 0.18);
+  --rough: 1.2;
+}

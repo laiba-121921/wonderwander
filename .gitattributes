@@ -1,0 +1,6 @@
+# Unix line endings in every checkout, so word for word checks (prompts, keys) agree on Windows too
+* text=auto eol=lf
+*.png binary
+*.woff2 binary
+*.pdf binary
+*.docx binary

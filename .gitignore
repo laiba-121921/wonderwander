@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+playwright/.cache/
+*.tsbuildinfo
+.env*
+supabase/.temp
+supabase/.branches
+.DS_Store
+Thumbs.db
+.pack
+content/

@@ -1,0 +1,26 @@
+# Supabase CLI settings used by `supabase functions deploy` (docs/SELF_HOST.md). Only what this project needs is set;
+# everything else keeps the CLI's defaults.
+project_id = "wonderwander"
+
+[edge_runtime]
+deno_version = 2
+
+# Signed-in callers only
+[functions.llm]
+verify_jwt = true
+import_map = "./functions/llm/deno.json"
+
+[functions.delete-account]
+verify_jwt = true
+
+# These check their callers themselves: the hourly job has a shared secret, joining has an invite code, setup is
+# harmless to repeat.
+[functions.push]
+verify_jwt = false
+import_map = "./functions/push/deno.json"
+
+[functions.invite]
+verify_jwt = false
+
+[functions.setup]
+verify_jwt = false

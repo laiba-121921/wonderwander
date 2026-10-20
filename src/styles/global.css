@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+@import './fonts.css';
+@import './tokens.css';
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-amber: var(--amber);
+  --color-bubblegum: var(--bubblegum);
+  --color-lilac: var(--lilac);
+  --color-grape: var(--grape);
+  --color-mint: var(--mint);
+  --color-sky: var(--sky);
+  --color-butter: var(--butter);
+  --color-peach: var(--peach);
+  --color-pistachio: var(--pistachio);
+  --color-coral: var(--coral);
+  --color-coral-tint: var(--coral-tint);
+
+  --font-ui: 'Logic Symbols', 'Shantell Sans Variable', system-ui, sans-serif;
+  --font-read: 'Logic Symbols', 'Literata Variable', Georgia, serif;
+
+  /* phone type scale, BUILD_PLAN 19.3 */
+  --text-caption: 13px;
+  --text-small: 15px;
+  --text-body: 17px;
+  --text-read: 18px;
+  --text-title: 22px;
+  --text-heading: 28px;
+  --text-display: 36px;
+
+  --radius-sheet: var(--r-sheet);
+  --radius-card: var(--r-card);
+  --radius-button: var(--r-button);
+  --radius-input: var(--r-input);
+  --shadow-sticker: var(--sticker);
+}
+
+/* Base element styles live in the base layer so utility classes can override them. */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background-color: var(--paper);
+    /* very subtle paper grain at 3 percent */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.18 0 0 0 0 0.15 0 0 0 0 0.27 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    font-family: var(--font-ui);
+    font-size: var(--text-body);
+    font-weight: 450;
+    font-variation-settings: 'INFM' 10;
+    line-height: 1.45;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
+    font-variation-settings: 'INFM' 80;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--grape);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  a {
+    color: var(--grape);
+  }
+
+}
+
+/* calm zones: lessons, keys, readings, long writing */
+.calm {
+  font-family: var(--font-read);
+  font-size: var(--text-read);
+  font-variation-settings: normal;
+  font-weight: 400;
+  line-height: 1.65;
+  max-width: 62ch;
+}
+
+/* Markdown inside calm zones */
+.prose-calm > * + * {
+  margin-top: 0.9em;
+}
+.prose-calm h2,
+.prose-calm h3,
+.prose-calm h4 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-variation-settings: 'INFM' 40;
+  margin-top: 1.6em;
+  line-height: 1.25;
+}
+.prose-calm h2 {
+  font-size: 1.25em;
+}
+.prose-calm h3 {
+  font-size: 1.1em;
+}
+.prose-calm h4 {
+  font-size: 1em;
+}
+.prose-calm ul,
+.prose-calm ol {
+  padding-left: 1.4em;
+}
+.prose-calm ul {
+  list-style: disc;
+}
+.prose-calm ol {
+  list-style: decimal;
+}
+.prose-calm li + li {
+  margin-top: 0.35em;
+}
+.prose-calm blockquote {
+  border-left: 3px solid var(--lilac);
+  padding-left: 0.9em;
+  color: var(--ink-soft);
+}
+.prose-calm table {
+  border-collapse: collapse;
+  font-size: 0.85em;
+  line-height: 1.45;
+}
+.prose-calm th,
+.prose-calm td {
+  border: 1.5px solid rgb(47 37 70 / 0.35);
+  padding: 0.35em 0.55em;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-calm code,
+.prose-calm pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.9em;
+}
+.prose-calm .found {
+  background: var(--butter);
+  box-shadow: 0 0 0 6px var(--butter);
+  border-radius: 4px;
+}
+
+/* a correct TAP answer gives a short wiggle (BUILD_PLAN 19.7) */
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-1.5deg);
+  }
+  75% {
+    transform: rotate(1.5deg);
+  }
+}
+.wiggle {
+  animation: wiggle 0.35s ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* the unit-passed confetti (BUILD_PLAN 19.7); never shown under reduced motion */
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0), 105vh, 0) rotate(540deg);
+    opacity: 0.9;
+  }
+}
+.confetti-bit {
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
+  animation-fill-mode: forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-bit {
+    display: none;
+  }
+}
